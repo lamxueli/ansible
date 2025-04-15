@@ -1,6 +1,6 @@
 ---
 - name: for git clone
-  hosts: mypc
+  hosts: all
 # 优先级：Group > Group:vars > playbook
   become: no # 全局root权限
   become_method: sudo

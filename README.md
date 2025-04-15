@@ -15,6 +15,9 @@ ssh eai@10.10.xx.xx
 sudo apt-get install -y ssh
 sudo service sshd start
 exit
+
+# 复制公钥到目标主机
+ssh-copy-id -i ./.ssh/id_ed25519.pub eai@22.22.99.999
 # 验证登录
 ssh eai@10.10.xx.xx # 成功应无需输入密码
 ```
