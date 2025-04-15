@@ -17,7 +17,7 @@ ssh eai@10.10.xx.xx
 sudo apt-get install -y ssh
 sudo service sshd start
 exit
-验证登录
+# 验证登录
 ssh eai@10.10.xx.xx # 成功应无需输入密码
 ```
 
