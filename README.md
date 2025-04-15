@@ -3,8 +3,6 @@
 ## 1. 环境配置
 
 ### 安装必要软件及配置
-
-## 1. 环境配置
 ```bash
 # 安装Ansible
 sudo pip install ansible
