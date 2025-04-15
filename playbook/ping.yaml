@@ -1,0 +1,33 @@
+---
+- name: for test
+  hosts: all
+# 优先级：Group > Group:vars > playbook
+  # user: eai
+  become: yes
+  become_method: sudo
+  become_user: root
+
+  vars:
+    # 加/仅表示目录的内容，不加/表示整个目录
+    # local_path: /home/eai-amd/
+    # remote_path: /home/eai/test/
+    # file_name: test02.py
+
+
+  tasks:
+    - name: Ping my hosts
+      ansible.builtin.ping:
+    - name: Print message
+      ansible.builtin.debug:
+       msg: Pong
+
+
+    # - name: List files in the current directory
+    #   command: ls
+    #   register: ls_output
+    # - name: Display the output of ls command
+    #   debug:
+    #     var: ls_output.stdout_lines
+
+
+# ansible-playbook -i /home/liu/ansible/inventory/hosts /home/liu/ansible/playbook/ping.yaml --ask-pass --ask-become-pass

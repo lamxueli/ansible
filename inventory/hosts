@@ -1,24 +1,34 @@
+[collector]
 [franka]
 # 10.11.37.127 ansible_user=eai ansible_ssh_pass=eai ansible_ssh_port=8080
 # 10.11.37.127 ansible_user=eai ansible_ssh_pass=eai 
 # 10.11.37.127
-dual_franka03 ansible_ssh_host=10.11.37.127
+franka01 ansible_host=10.10.245.203
+franka02 ansible_host=10.10.246.25
+franka03 ansible_host=10.10.246.54
+franka04 ansible_host=10.10.245.204
+
+[ur]
+ur01 ansible_host=10.10.246.103
+ur03 ansible_host=10.10.246.101
 
 
 # 优先级低于直接在Group设定的参数
 [franka:vars]
 ansible_user=eai
-ansible_ssh_pass=eai 
+ansible_ssh_pass=eai
 ansible_become_pass=eai
 
 
 # franka < robot
-[robot:children]
+[collector:children]
 franka
+ur
 
-[robot:vars]
-# ansible_user=eai
-# ansible_ssh_pass=eai 
+[collector:vars]
+ansible_user=eai
+ansible_ssh_pass=eai 
+ansible_become_pass=eai
 
 
-# ansible-playbook -i /home/eai-amd/ansible-devel/inventory/hosts ansible_test01.yaml --ask-become-pass
+# ansible-playbook -i /home/liu/ansible/inventory/hosts playbook/ansible_test02.yaml --ask-become-pass

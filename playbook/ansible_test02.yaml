@@ -1,0 +1,86 @@
+ 
+  # - hosts: franka
+  #   # user: eai
+  #   tasks:
+  #       - name: just test
+  #         become: yes
+  #         become_user: eai
+  #         become_method: sudo
+  #         shell: mkdir -p /tmp/test
+
+---
+- name: for test
+  hosts: all
+# 优先级：Group > Group:vars > playbook
+  # user: eai
+  become: yes
+  become_method: sudo
+  become_user: root
+
+  vars:
+    # 加/仅表示目录的内容，不加/表示整个目录
+    local_path: /home/eai-amd/
+    remote_path: /home/eai/test/
+    file_name: test02.py
+
+
+  tasks:
+    - name: Ping my hosts
+      ansible.builtin.ping:
+    - name: Print message
+      ansible.builtin.debug:
+       msg: Pong
+       
+    # - name: Copy a file
+    #   ansible.builtin.copy:
+    #     src: "{{ local_path }}/{{ file_name }}"
+    #     dest: "{{ remote_path }}"
+
+
+    - name: List files in the current directory
+      command: ls test
+      register: ls_output
+    - name: Display the output of ls command
+      debug:
+        var: ls_output.stdout_lines
+
+# 普通删除
+    # - name: Check if file exists
+    #   ansible.builtin.stat:
+    #     path: "{{remote_path}}/{{file_name}}"
+    #   register: file_stat
+
+    # - name: Remove the file
+    #   ansible.builtin.file:
+    #     path: "{{remote_path}}/{{file_name}}"
+    #     state: absent
+    #   when: file_stat.stat.exists  # 仅当文件存在时执行
+
+
+# 遍历删除
+    # - name: Find all .log files
+    #   become: yes
+    #   become_method: sudo
+    #   become_user: eai
+    #   ansible.builtin.find:
+    #     paths: "{{remote_path}}" # 搜索的目录
+    #     patterns: "*.py"  # 匹配的文件模式
+    #     recurse: no  # 递归搜索子目录
+    #   register: py_files
+
+    # - name: Remove all .py files
+    #   ansible.builtin.file:
+    #     path: "{{ item.path }}"
+    #     state: absent
+    #   loop: "{{ py_files.files }}"  # 遍历所有匹配的文件
+
+
+    # - name: List files in the current directory
+    #   command: ls test
+    #   register: ls_output
+    # - name: Display the output of ls command
+    #   debug:
+    #     var: ls_output.stdout_lines
+
+
+# ansible-playbook -i /home/eai-amd/ansible-devel/inventory/hosts playbook/ansible_test02.yaml --ask-pass --ask-become-pass
