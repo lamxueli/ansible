@@ -1,6 +1,6 @@
 ---
 - name: for test
-  hosts: collector
+  hosts: all
 # 优先级：Group > Group:vars > playbook
   # user: eai
   become: yes
