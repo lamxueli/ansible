@@ -3,6 +3,8 @@
 ## 1. 环境配置
 
 ### 安装必要软件及配置
+
+## 1. 环境配置
 ```bash
 # 安装Ansible
 sudo pip install ansible
@@ -14,12 +16,18 @@ ssh eai@10.10.xx.xx
 # 在目标主机上安装SSH服务
 sudo apt-get install -y ssh
 sudo service sshd start
+exit
 验证登录
 ssh eai@10.10.xx.xx # 成功应无需输入密码
+```
 
 ## 2.使用ansible
-=
+```bash
+cd ./ansible
+# 测试主机连通性
 ansible-playbook -i ./inventory/hosts ./playbook/ping.yaml
-ansible-playbook -i ./inventory/hosts ./playbook/gitclone.yaml
-若目标文件夹不为空 input "yes" 删除内容 
 
+# git clone 操作
+ansible-playbook -i ./inventory/hosts ./playbook/gitclone.yaml
+# 若目标文件夹不为空 input "yes" 删除内容
+```
