@@ -1,0 +1,128 @@
+---
+- name: for git clone
+  hosts: mypc
+# 优先级：Group > Group:vars > playbook
+  become: no # 全局root权限
+  become_method: sudo
+  become_user: root
+       
+  vars:
+    repo_url: "git@10.0.3.101:embodied-ai/sysEAI/xRocs.git"
+    # clone_dir: "/media/liu/8T_Disk/xRocs"  # 目标目录
+    clone_dir: "/home/liu/test/xRocs"
+    branch: "dev-1.5"  # 可选：指定需要的git版本
+
+    key_path: "/home/liu/.ssh/id_ed25519" # SSH私钥路径
+
+  tasks:
+    # 1.1. 检查目录状态
+    - name: Check target directory status
+      stat:
+        path: "{{ clone_dir }}"
+      register: dir_stat
+
+    # 1.2. 交互式确认（仅当目录存在且不为空时触发）
+    - name: Confirm deletion for non-empty directory
+      when: dir_stat.stat.exists and dir_stat.stat.isdir and (dir_stat.stat.size > 0)
+      block:
+        - name: Display warning
+          debug:
+            msg: |
+              WARNING: Directory '{{ clone_dir }}' is NOT empty!
+              All contents will be permanently deleted.
+        # 输入"yes"以确认删除，否则将中止
+        - name: Get user confirmation
+          pause:
+            prompt: "Type 'yes' to confirm deletion (otherwise will abort)"
+            echo: yes
+          register: user_confirmation
+          failed_when: "user_confirmation.user_input.lower() != 'yes'"
+
+        - name: Delete directory after confirmation
+          file:
+            path: "{{ clone_dir }}"
+            state: absent
+          when: "user_confirmation.user_input.lower() != 'yes'"
+
+    # 1.3. 创建目录（如果不存在或已被删除）
+    - name: Create directory if not exists
+      when: not dir_stat.stat.exists
+      file:
+        path: "{{ clone_dir }}"
+        state: directory
+        mode: '0755'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+
+
+    # 2.1 单次git克隆操作（以普通用户身份运行）
+    - name: Clone repository using SSH key
+      environment:
+        GIT_SSH_COMMAND: "ssh -i {{ key_path }} -o IdentitiesOnly=yes"  # 显式指定密钥
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ clone_dir }}"
+        version: "{{ branch }}"
+        accept_hostkey: yes
+        clone: yes
+        update: no
+        force: yes
+      register: clone_result
+      ignore_errors: yes
+
+    # 2.2 获取所有分支信息
+    - name: Fetch all branches
+      command: "git fetch"
+      args:
+        chdir: "{{ clone_dir }}"
+      when: clone_result is defined and not clone_result.failed
+
+    # 2.3 检出指定分支
+    - name: Checkout specific branch
+      command: "git checkout {{ branch }}"
+      args:
+        chdir: "{{ clone_dir }}"
+      register: checkout_result
+      when: clone_result is defined and not clone_result.failed
+
+    # 2.4 验证分支切换
+    - name: Verify branch
+      command: "git branch --show-current"
+      args:
+        chdir: "{{ clone_dir }}"
+      register: current_branch
+      when: clone_result is defined and not clone_result.failed
+
+    # 2.5 错误处理
+    - name: Fail if wrong branch
+      fail:
+        msg: |
+          Failed to checkout branch '{{ branch }}'!
+          Current branch: {{ current_branch.stdout }}
+          Available branches:
+            {{ available_branches.stdout_lines | join('\n  ') }}
+      when: >
+        checkout_result is defined and
+        (checkout_result.failed or 
+         current_branch.stdout.strip() != branch)
+
+    # 2.6 获取可用分支列表（用于错误提示）
+    - name: Get available branches
+      command: "git branch -a"
+      args:
+        chdir: "{{ clone_dir }}"
+      register: available_branches
+      # when: >
+      #   checkout_result is defined and
+      #   (checkout_result.failed or 
+      #    current_branch.stdout.strip() != branch)
+
+
+    - name: Debug clone result
+      debug:
+        var: clone_result
+
+
+
+
+# ansible-playbook -i /home/liu/ansible/inventory/hosts /home/liu/ansible/playbook/gitclone.yaml

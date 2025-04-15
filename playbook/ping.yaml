@@ -30,4 +30,5 @@
     #     var: ls_output.stdout_lines
 
 
+# ansible-playbook -i /home/liu/ansible/inventory/hosts /home/liu/ansible/playbook/ping.yaml
 # ansible-playbook -i /home/liu/ansible/inventory/hosts /home/liu/ansible/playbook/ping.yaml --ask-pass --ask-become-pass

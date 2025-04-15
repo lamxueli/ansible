@@ -1,10 +1,13 @@
+[mypc]
+mycomputer ansible_host=10.10.245.199 ansible_user=liu ansible_become_pass=453699
+
 [collector]
 [franka]
 # 10.11.37.127 ansible_user=eai ansible_ssh_pass=eai ansible_ssh_port=8080
 # 10.11.37.127 ansible_user=eai ansible_ssh_pass=eai 
 # 10.11.37.127
 franka01 ansible_host=10.10.245.203
-franka02 ansible_host=10.10.246.25
+franka02 ansible_host=10.10.245.25
 franka03 ansible_host=10.10.246.54
 franka04 ansible_host=10.10.245.204
 
@@ -15,9 +18,9 @@ ur03 ansible_host=10.10.246.101
 
 # 优先级低于直接在Group设定的参数
 [franka:vars]
-ansible_user=eai
-ansible_ssh_pass=eai
-ansible_become_pass=eai
+; ansible_user=eai
+; ansible_ssh_pass=eai
+; ansible_become_pass=eai
 
 
 # franka < robot
