@@ -8,8 +8,7 @@
        
   vars:
     repo_url: "git@10.0.3.101:embodied-ai/sysEAI/xRocs.git"
-    # clone_dir: "/media/liu/8T_Disk/xRocs"  # 目标目录
-    clone_dir: "/home/liu/test/xRocs"
+    clone_dir: "/media/liu/8T_Disk/xRocs"  # 目标目录
     branch: "dev-1.5"  # 可选：指定需要的git版本
 
     key_path: "/home/liu/.ssh/id_ed25519" # SSH私钥路径
@@ -128,3 +127,4 @@
 
 
 # ansible-playbook -i /home/liu/ansible/inventory/hosts /home/liu/ansible/playbook/gitclone.yaml
+# ansible-playbook -i ./inventory/hosts ./playbook/gitclone.yaml

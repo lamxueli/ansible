@@ -58,29 +58,29 @@
 
 
 # 遍历删除
-    # - name: Find all .log files
-    #   become: yes
-    #   become_method: sudo
-    #   become_user: eai
-    #   ansible.builtin.find:
-    #     paths: "{{remote_path}}" # 搜索的目录
-    #     patterns: "*.py"  # 匹配的文件模式
-    #     recurse: no  # 递归搜索子目录
-    #   register: py_files
+    - name: Find all .log files
+      become: yes
+      become_method: sudo
+      become_user: eai
+      ansible.builtin.find:
+        paths: "{{remote_path}}" # 搜索的目录
+        patterns: "*.py"  # 匹配的文件模式
+        recurse: no  # 递归搜索子目录
+      register: py_files
 
-    # - name: Remove all .py files
-    #   ansible.builtin.file:
-    #     path: "{{ item.path }}"
-    #     state: absent
-    #   loop: "{{ py_files.files }}"  # 遍历所有匹配的文件
+    - name: Remove all .py files
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ py_files.files }}"  # 遍历所有匹配的文件
 
 
-    # - name: List files in the current directory
-    #   command: ls test
-    #   register: ls_output
-    # - name: Display the output of ls command
-    #   debug:
-    #     var: ls_output.stdout_lines
+    - name: List files in the current directory
+      command: ls test
+      register: ls_output
+    - name: Display the output of ls command
+      debug:
+        var: ls_output.stdout_lines
 
 
 # ansible-playbook -i /home/eai-amd/ansible-devel/inventory/hosts playbook/ansible_test02.yaml --ask-pass --ask-become-pass
