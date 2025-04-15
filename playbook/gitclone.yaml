@@ -112,12 +112,14 @@
       args:
         chdir: "{{ clone_dir }}"
       register: available_branches
-      # when: >
-      #   checkout_result is defined and
-      #   (checkout_result.failed or 
-      #    current_branch.stdout.strip() != branch)
+      when: >
+        checkout_result is defined and
+        (checkout_result.failed or 
+         current_branch.stdout.strip() != branch)
 
-
+    - name: Display available branches
+      debug:
+        var: available_branches.stdout_lines
     - name: Debug clone result
       debug:
         var: clone_result
