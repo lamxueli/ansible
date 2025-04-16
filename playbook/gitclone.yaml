@@ -1,17 +1,25 @@
 ---
 - name: for git clone
-  hosts: all
+  hosts: mypc
 # 优先级：Group > Group:vars > playbook
   become: no # 全局root权限
   become_method: sudo
   become_user: root
        
   vars:
-    repo_url: "git@10.0.3.101:embodied-ai/sysEAI/xRocs.git"
-    clone_dir: "/media/liu/8T_Disk/xRocs"  # 目标目录
-    branch: "dev-1.5"  # 可选：指定需要的git版本
+    # Https 模式
+    repo_url: "http://10.0.3.101/embodied-ai/sysEAI/xRocs.git"
+    # repo_url: "http://harvey.liu:liu599453699@10.0.3.101/embodied-ai/sysEAI/xRocs.git"
+    # 认证
+    git_username: "harvey.liu"
+    git_password: "liu599453699"
 
-    key_path: "/home/liu/.ssh/id_ed25519" # SSH私钥路径
+    # SSH 模式
+    # repo_url: "git@10.0.3.101:embodied-ai/sysEAI/xRocs.git"
+    # key_path: "/home/liu/.ssh/id_ed25519" # SSH私钥路径
+
+    clone_dir: "./tmp/xRocs"  # 目标目录
+    branch: "dev-1.5"  # 可选：指定需要的git版本
 
   tasks:
     # 1.1. 检查目录状态
@@ -55,9 +63,12 @@
 
 
     # 2.1 单次git克隆操作（以普通用户身份运行）
-    - name: Clone repository using SSH key
+    - name: git clone...
       environment:
         GIT_SSH_COMMAND: "ssh -i {{ key_path }} -o IdentitiesOnly=yes"  # 显式指定密钥
+        GIT_ASKPASS: "/bin/echo"
+        GIT_USERNAME: "{{ git_username }}"
+        GIT_PASSWORD: "{{ git_password }}"
       git:
         repo: "{{ repo_url }}"
         dest: "{{ clone_dir }}"
@@ -66,8 +77,9 @@
         clone: yes
         update: no
         force: yes
+
       register: clone_result
-      ignore_errors: yes
+
 
     # 2.2 获取所有分支信息
     - name: Fetch all branches
@@ -84,6 +96,7 @@
       register: checkout_result
       when: clone_result is defined and not clone_result.failed
 
+
     # 2.4 验证分支切换
     - name: Verify branch
       command: "git branch --show-current"
@@ -92,36 +105,19 @@
       register: current_branch
       when: clone_result is defined and not clone_result.failed
 
-    # 2.5 错误处理
-    - name: Fail if wrong branch
-      fail:
-        msg: |
-          Failed to checkout branch '{{ branch }}'!
-          Current branch: {{ current_branch.stdout }}
-          Available branches:
-            {{ available_branches.stdout_lines | join('\n  ') }}
-      when: >
-        checkout_result is defined and
-        (checkout_result.failed or 
-         current_branch.stdout.strip() != branch)
-
-    # 2.6 获取可用分支列表（用于错误提示）
-    - name: Get available branches
-      command: "git branch -a"
-      args:
-        chdir: "{{ clone_dir }}"
-      register: available_branches
-      when: >
-        checkout_result is defined and
-        (checkout_result.failed or 
-         current_branch.stdout.strip() != branch)
-
     - name: Display available branches
       debug:
         var: available_branches.stdout_lines
     - name: Debug clone result
       debug:
         var: clone_result
+    
+    # 2.5 清理敏感信息
+    - name: Clean up credentials
+      file:
+        path: "/home/{{ ansible_user }}/.git-credentials"
+        state: absent
+      when: clone_result is defined and clone_result.changed
 
 
 

@@ -1,0 +1,68 @@
+# - name: My first play
+#   hosts: franka
+#   tasks:
+#    - name: Ping my hosts
+#      ansible.builtin.ping:
+
+#    - name: Print message
+#      ansible.builtin.debug:
+#        msg: Hello world
+
+
+---
+- name: Execute ls and git pull
+  hosts: franka
+  # become: yes
+  tasks:
+    - name: List files in the current directory
+      command: ls -l
+      register: ls_output
+    - name: Display the output of ls command
+      debug:
+        var: ls_output.stdout_lines
+
+
+    # - name: Backup local modifications
+    #   command: git stash
+    #   args:
+    #     chdir: /home/eai/Dev/test
+    #   register: git_stash
+    #   ignore_errors: yes  # 忽略错误，继续执行
+    # - name: Display stash result
+    #   debug:
+    #     var: git_stash.stdout
+
+
+    - name: Git pull from repository
+      git:
+        # repo: 'http://felix.yang:zhang950904@10.0.3.101/embodied-ai/dexterous-hand/3D-Diffusion-Policy.git'
+        repo: 'http://harvey.liu:liu599453699@10.0.3.101/kaiwu/agent/eai-control-agent-ws/eai_control_agent.git'
+        dest: /home/eai/Dev/test
+        version: master  # 或者你希望拉取的分支名
+        clone: yes
+        update: yes  # 如果目录已存在，是否更新（设置为 no 表示仅克隆）
+        force: yes  # 强制更新，丢弃本地修改
+      register: git_output
+
+    - name: Display the output of git pull command
+      debug:
+        var: git_output.stdout_lines
+
+
+    # # 使用 SSH 拉取 Git 仓库
+    # - name: Update code using git pull with SSH
+    #   git:
+    #     repo: 'git@10.0.3.101:embodied-ai/dexterous-hand/3D-Diffusion-Policy.git'  # SSH 格式的仓库 URL
+    #     dest: /home/eai/Dev/test
+    #     version: master  # 拉取的分支名
+    #     update: yes  # 设置为 yes 以执行 git pull
+    #     key_file: /home/eai/.ssh/id_rsa  # 指定 SSH 私钥路径
+    #   register: git_pull_output
+
+    # # 显示 git pull 的结果
+    # - name: Display the result of git pull
+    #   debug:
+    #     var: git_pull_output
+
+
+    

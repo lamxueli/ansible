@@ -9,8 +9,8 @@ franka03 ansible_host=10.10.246.54
 franka04 ansible_host=10.10.245.204
 
 [ur]
-ur01 ansible_host=10.10.246.103
-ur03 ansible_host=10.10.246.101
+ur01 ansible_host=10.10.246.101
+ur03 ansible_host=10.10.246.103
 
 
 # 优先级低于直接在Group设定的参数
@@ -32,3 +32,6 @@ ansible_become_pass=eai
 
 
 # ansible-playbook -i /home/liu/ansible/inventory/hosts playbook/ansible_test02.yaml --ask-become-pass
+
+[mypc]
+mycomputer ansible_host=10.10.323232325.199 ansible_user=liu ansible_become_pass=123456 # 无SSH认证，使用 ansible_become_pass 密码登录

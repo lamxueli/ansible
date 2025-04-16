@@ -23,6 +23,20 @@
     remote_path: /home/eai/test/
     file_name: test02.py
 
+    # Https 模式
+    repo_url: "http://10.0.3.101/embodied-ai/sysEAI/xRocs.git"
+    # repo_url: "http://harvey.liu:liu599453699@10.0.3.101/embodied-ai/sysEAI/xRocs.git"
+    # 认证
+    git_username: "harvey.liu"
+    git_password: "liu599453699"
+
+    # SSH 模式
+    # repo_url: "git@10.0.3.101:embodied-ai/sysEAI/xRocs.git"
+    # key_path: "/home/liu/.ssh/id_ed25519" # SSH私钥路径
+
+    clone_dir: "./tmp/xRocs"  # 目标目录
+    branch: "dev-1.5"  # 可选：指定需要的git版本
+
 
   tasks:
     - name: Ping my hosts
